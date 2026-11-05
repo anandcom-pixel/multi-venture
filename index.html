@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Multi-Venture Daily Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- =========================================================================
+       STICKY HEADER WITH EDITABLE USER PROFILE
+       ========================================================================= -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-section">
+        <div class="brand-icon-wrapper" title="Multi-Venture Daily Tracker">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+        </div>
+        <div class="brand-title-group">
+          <h1 class="app-title">Multi-Venture Daily Tracker</h1>
+          <div class="user-profile-bar">
+            <button class="user-subtitle" onclick="openEditProfileModal()" title="Click to edit your custom profile name / platform subtitle">
+              <span id="userProfileNameDisplay">Anand Mohandas</span>
+              <span style="color: var(--border-color); margin: 0 3px;">•</span>
+              <span id="userProfileSubtitleDisplay">Solo Development Platform</span>
+              <span class="edit-pencil-btn" aria-label="Edit Profile">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Controls: Date, Streak, Backup -->
+      <div class="header-actions">
+        <div class="date-stepper-wrap">
+          <button class="btn-icon-only btn-sm" onclick="changeSelectedDate(-1)" title="Previous Day">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <div class="date-badge" id="currentDateDisplay" onclick="jumpToToday()" title="Click to jump to Today">
+            Today
+          </div>
+          <button class="btn-icon-only btn-sm" onclick="changeSelectedDate(1)" title="Next Day">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+        <div class="streak-pill" id="userStreakDisplay" title="Current Daily Streak">
+          🔥 7d streak
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="openModal('backupModal')" title="Data Backup &amp; JSON Export/Import">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span>Backup</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       MAIN APPLICATION CONTAINER
+       ========================================================================= -->
+  <main class="app-container">
+
+    <!-- GLOBAL "DAILY RHYTHM COMPLETION" PROGRESS BANNER & RESET BUTTON -->
+    <section class="daily-rhythm-banner">
+      <div class="rhythm-header-row">
+        <div class="rhythm-label-group">
+          <span class="rhythm-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+            Day's activity Completion:
+          </span>
+          <span class="rhythm-counter-pill" id="rhythmProgressFraction">
+            0 / 0 Tasks Completed (0%)
+          </span>
+        </div>
+
+        <div class="rhythm-actions-group">
+          <button class="btn btn-amber btn-sm" onclick="resetDailyChecks()" title="Reset all task checkboxes for today without deleting time blocks or tasks">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 2v6h6"></path><path d="M21 12A9 9 0 0 0 6 5.3L3 8"></path><path d="M21 22v-6h-6"></path><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"></path></svg>
+            Reset Daily Checks
+          </button>
+        </div>
+      </div>
+
+      <!-- Animated Progress Bar -->
+      <div class="progress-bar-track" title="Overall Daily Rhythm Completion Rate">
+        <div class="progress-bar-fill" id="rhythmProgressBarFill" style="width: 0%;"></div>
+      </div>
+    </section>
+
+    <!-- 5-TAB NAVIGATION (DESKTOP & TABLET) -->
+    <nav class="top-nav-tabs-5" aria-label="Primary 5-Tab Navigation">
+      <button class="top-tab-btn-5 active" data-tab="rhythmTab" onclick="switchTab('rhythmTab')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        Day's activity
+      </button>
+      <button class="top-tab-btn-5" data-tab="opportunityTab" onclick="switchTab('opportunityTab')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        Opportunities
+      </button>
+      <button class="top-tab-btn-5" data-tab="venturesTab" onclick="switchTab('venturesTab')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+        Ventures Portfolio
+      </button>
+      <button class="top-tab-btn-5" data-tab="analyticsTab" onclick="switchTab('analyticsTab')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        Analytics &amp; Data
+      </button>
+      <button class="top-tab-btn-5" data-tab="timerTab" onclick="switchTab('timerTab')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+        Focus Timer
+      </button>
+    </nav>
+
+    <!-- =========================================================================
+         TAB 1: DAILY OPERATING RHYTHM (2-COLUMN GRID OF TIME-BLOCK CARDS)
+         ========================================================================= -->
+    <section id="rhythmTab" class="view-section active">
+      <div class="section-top-bar">
+        <div>
+          <h2 class="section-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            Day's Activity (Time Blocks)
+          </h2>
+          <span class="section-subtitle">Structured 4-block daily schedule with high-leverage workflows and solo engineering habits</span>
+        </div>
+        <button class="btn btn-primary" onclick="openAddTimeBlockModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          + Add Time Block
+        </button>
+      </div>
+
+      <!-- Responsive 2-Column Grid of Time-Block Cards -->
+      <div class="time-blocks-grid" id="timeBlocksGridContainer"></div>
+    </section>
+
+    <!-- =========================================================================
+         TAB 2: OPPORTUNITY TRACKER (5 PILLARS)
+         ========================================================================= -->
+    <section id="opportunityTab" class="view-section">
+      <div class="section-top-bar">
+        <div>
+          <h2 class="section-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            5-Pillar Opportunity Tracker
+          </h2>
+          <span class="section-subtitle">Capture, prioritize, and dispatch high-value opportunities into your daily rhythm</span>
+        </div>
+        <button class="btn btn-primary" onclick="openAddOpportunityModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          + Add Opportunity
+        </button>
+      </div>
+
+      <!-- Pillar Filter Chips -->
+      <div class="pillar-filter-bar" id="pillarFiltersContainer"></div>
+
+      <!-- Opportunities Grid -->
+      <div class="opportunities-grid" id="opportunitiesGridContainer"></div>
+    </section>
+
+    <!-- =========================================================================
+         TAB 3: VENTURES PORTFOLIO (REAL VENTURES)
+         ========================================================================= -->
+    <section id="venturesTab" class="view-section">
+      <div class="section-top-bar">
+        <div>
+          <h2 class="section-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            Ventures Portfolio
+          </h2>
+          <span class="section-subtitle">Active platforms, client operations, and deployed software systems</span>
+        </div>
+        <button class="btn btn-primary" onclick="openAddVentureModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          + Add Venture
+        </button>
+      </div>
+
+      <!-- Ventures Grid -->
+      <div class="ventures-grid" id="venturesGridContainer"></div>
+    </section>
+
+    <!-- =========================================================================
+         TAB 4: ANALYTICS & DATA
+         ========================================================================= -->
+    <section id="analyticsTab" class="view-section">
+      <div class="section-top-bar">
+        <div>
+          <h2 class="section-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            Analytics &amp; Operating Metrics
+          </h2>
+          <span class="section-subtitle">Execution velocity, opportunity matrix distribution, and focus allocation</span>
+        </div>
+      </div>
+
+      <!-- 4 Visual Stat Cards -->
+      <div class="stats-cards-grid">
+        <div class="stat-metric-card">
+          <span class="stat-metric-label">Daily Tasks Completed</span>
+          <span class="stat-metric-number" id="statCompletedTasks">0 / 0</span>
+          <span class="stat-metric-sub">Today's active rhythm checks</span>
+        </div>
+        <div class="stat-metric-card">
+          <span class="stat-metric-label">Active Ventures</span>
+          <span class="stat-metric-number" id="statActiveVentures">3 Platforms</span>
+          <span class="stat-metric-sub">Core portfolio platforms</span>
+        </div>
+        <div class="stat-metric-card">
+          <span class="stat-metric-label">Opportunities Tracked</span>
+          <span class="stat-metric-number" id="statTotalOpportunities">5 Pipeline</span>
+          <span class="stat-metric-sub">Across 5 strategic pillars</span>
+        </div>
+        <div class="stat-metric-card">
+          <span class="stat-metric-label">Focus Logged</span>
+          <span class="stat-metric-number" id="statTimeLogged">0 mins</span>
+          <span class="stat-metric-sub">Deep work recorded across portfolio</span>
+        </div>
+      </div>
+
+      <!-- 7-Day Completion Velocity Canvas Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <h3 style="font-size: 1.0625rem; font-weight: 800; color: var(--text-main);">7-Day Completion Velocity</h3>
+            <span style="font-size: 0.8125rem; color: var(--text-secondary);">Daily checklist task completions over the last 7 days</span>
+          </div>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="completionTrendCanvas"></canvas>
+        </div>
+      </div>
+
+      <!-- 2-Column Grid for Matrix Breakdown & Time Distribution -->
+      <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 1.5rem;" class="grid-2col-responsive">
+        <!-- 5-Pillar Opportunity Matrix Breakdown -->
+        <div class="chart-card" style="margin-bottom: 0;">
+          <h3 style="font-size: 1rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.25rem;">Opportunity Breakdown by Pillar</h3>
+          <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem;">Distribution of initiatives in pipeline</p>
+          <div id="pillarMatrixBreakdownContainer"></div>
+        </div>
+
+        <!-- Venture Focus Distribution -->
+        <div class="chart-card" style="margin-bottom: 0;">
+          <h3 style="font-size: 1rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.25rem;">Venture Focus Time Logged</h3>
+          <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem;">Minutes of deep work logged per venture</p>
+          <div id="ventureFocusDistributionContainer"></div>
+        </div>
+      </div>
+
+      <!-- Local Data Sovereignty Panel -->
+      <div class="chart-card">
+        <h3 style="font-size: 1rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.25rem;">Local Data Sovereignty &amp; Backups</h3>
+        <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          Your data is 100% private and persists locally in your browser's localStorage. Zero tracking or remote servers.
+        </p>
+        <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+          <button class="btn btn-primary btn-sm" onclick="exportDataJSON()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Export All Data (JSON)
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="openModal('backupModal')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            Import Backup File
+          </button>
+          <button class="btn btn-soft-blue btn-sm" onclick="reloadDefaultData()">
+            Reload Defaults
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="clearAllData()">
+            Clear All Data
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         TAB 5: FOCUS TIMER
+         ========================================================================= -->
+    <section id="timerTab" class="view-section">
+      <div class="section-top-bar">
+        <div>
+          <h2 class="section-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            Solo Focus Timer
+          </h2>
+          <span class="section-subtitle">Dedicated sprint countdown with synthesized offline audio chimes</span>
+        </div>
+      </div>
+
+      <div class="chart-card" style="max-width: 620px; margin: 0 auto;">
+        <div class="timer-container">
+          <!-- Target Selector -->
+          <div class="form-group" style="width: 100%; max-width: 320px;">
+            <label class="form-label" for="timerTargetSelect">Attributed Venture / Platform:</label>
+            <select class="form-select" id="timerTargetSelect" onchange="handleTimerTargetChange(event)"></select>
+          </div>
+
+          <!-- Circular SVG Ring -->
+          <div class="timer-circle-wrap">
+            <svg class="timer-svg" viewBox="0 0 220 220">
+              <circle class="timer-circle-bg" cx="110" cy="110" r="100"></circle>
+              <circle class="timer-circle-progress" id="timerProgressSvgCircle" cx="110" cy="110" r="100"></circle>
+            </svg>
+            <div class="timer-display">
+              <div class="timer-time-text" id="timerMinutesSecondsDisplay">25:00</div>
+              <div class="timer-target-label" id="timerActiveTargetName">RECOVERYGOD.COM</div>
+            </div>
+          </div>
+
+          <!-- Presets -->
+          <div class="timer-preset-row">
+            <button class="btn btn-secondary btn-sm" onclick="setTimerPreset(15)">15m Quick</button>
+            <button class="btn btn-secondary btn-sm" onclick="setTimerPreset(25)">25m Pomodoro</button>
+            <button class="btn btn-secondary btn-sm" onclick="setTimerPreset(50)">50m Deep Work</button>
+          </div>
+
+          <!-- Controls -->
+          <div class="timer-controls">
+            <button class="btn btn-primary" id="timerPlayPauseBtn" onclick="toggleTimer()" style="min-width: 140px; padding: 0.75rem 1.5rem; font-size: 1rem;">
+              ▶ Start Focus
+            </button>
+            <button class="btn btn-secondary" onclick="resetTimer()" title="Reset Timer">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v6h6"></path><path d="M21 12A9 9 0 0 0 6 5.3L3 8"></path></svg>
+              Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================================
+       MOBILE BOTTOM NAVIGATION (5 TABS)
+       ========================================================================= -->
+  <nav class="mobile-bottom-tabs-5" aria-label="Mobile Navigation">
+    <button class="mobile-tab-btn-5 active" data-tab="rhythmTab" onclick="switchTab('rhythmTab')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      <span>Activity</span>
+    </button>
+    <button class="mobile-tab-btn-5" data-tab="opportunityTab" onclick="switchTab('opportunityTab')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+      <span>Pillars</span>
+    </button>
+    <button class="mobile-tab-btn-5" data-tab="venturesTab" onclick="switchTab('venturesTab')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+      <span>Ventures</span>
+    </button>
+    <button class="mobile-tab-btn-5" data-tab="analyticsTab" onclick="switchTab('analyticsTab')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+      <span>Data</span>
+    </button>
+    <button class="mobile-tab-btn-5" data-tab="timerTab" onclick="switchTab('timerTab')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+      <span>Timer</span>
+    </button>
+  </nav>
+
+  <!-- =========================================================================
+       MODALS
+       ========================================================================= -->
+
+  <!-- MODAL 1: EDIT USER PROFILE -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Edit User Profile
+        </h3>
+        <button class="btn-icon-only" onclick="closeModal('profileModal')">&times;</button>
+      </div>
+      <form onsubmit="handleSaveProfile(event)">
+        <div class="form-group">
+          <label class="form-label" for="profileNameInput">Your Name:</label>
+          <input type="text" class="form-input" id="profileNameInput" required placeholder="e.g. Anand Mohandas">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="profileSubtitleInput">Platform Subtitle / Role Tagline:</label>
+          <input type="text" class="form-input" id="profileSubtitleInput" placeholder="e.g. Solo Development Platform">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('profileModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: ADD / EDIT TIME BLOCK -->
+  <div class="modal-overlay" id="blockModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="blockModalTitle">Add Time Block</h3>
+        <button class="btn-icon-only" onclick="closeModal('blockModal')">&times;</button>
+      </div>
+      <form onsubmit="handleSaveTimeBlock(event)">
+        <input type="hidden" id="blockEditIdInput" value="">
+        <div class="form-group">
+          <label class="form-label" for="blockTitleInput">Block Title:</label>
+          <input type="text" class="form-input" id="blockTitleInput" required placeholder="e.g. Block 1: Morning Foundation &amp; Focus">
+        </div>
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label" for="blockTimeWindowInput">Time Window:</label>
+            <input type="text" class="form-input" id="blockTimeWindowInput" placeholder="e.g. 08:00 AM – 10:00 AM">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="blockColorInput">Border Color Accent:</label>
+            <input type="color" class="form-input" id="blockColorInput" value="#1E40AF" style="height: 42px; padding: 2px;">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="blockObjectiveInput">Block Objective:</label>
+          <textarea class="form-textarea" id="blockObjectiveInput" placeholder="State the core objective and leverage area for this block..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('blockModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Time Block</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: EDIT CHECKLIST TASK -->
+  <div class="modal-overlay" id="taskEditModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Checklist Task</h3>
+        <button class="btn-icon-only" onclick="closeModal('taskEditModal')">&times;</button>
+      </div>
+      <form onsubmit="handleSaveEditedTask(event)">
+        <div class="form-group">
+          <label class="form-label" for="editTaskTitleInput">Task Description:</label>
+          <input type="text" class="form-input" id="editTaskTitleInput" required>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label" for="editTaskTagInput">Category Tag:</label>
+            <input type="text" class="form-input" id="editTaskTagInput" placeholder="e.g. Android Dev, Core Business">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editTaskBlockSelect">Assign to Block:</label>
+            <select class="form-select" id="editTaskBlockSelect"></select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('taskEditModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4: ADD / EDIT OPPORTUNITY (5 PILLARS) -->
+  <div class="modal-overlay" id="oppModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="oppModalTitle">Add Opportunity</h3>
+        <button class="btn-icon-only" onclick="closeModal('oppModal')">&times;</button>
+      </div>
+      <form onsubmit="handleSaveOpportunity(event)">
+        <input type="hidden" id="oppEditIdInput" value="">
+        <div class="form-group">
+          <label class="form-label" for="oppTitleInput">Opportunity Title:</label>
+          <input type="text" class="form-input" id="oppTitleInput" required placeholder="e.g. Enterprise RAID Data Recovery Tier">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label" for="oppPillarSelect">Pillar Classification:</label>
+            <select class="form-select" id="oppPillarSelect">
+              <option value="Commercial Need">1. Commercial Need</option>
+              <option value="Existing Expertise">2. Existing Expertise</option>
+              <option value="Growth Opportunity">3. Growth Opportunity</option>
+              <option value="Long-Term Opportunity">4. Long-Term Opportunity</option>
+              <option value="Extra Opportunities">5. Extra Opportunities</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="oppPrioritySelect">Priority Level:</label>
+            <select class="form-select" id="oppPrioritySelect">
+              <option value="High">High</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="Exploratory">Exploratory</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="oppBlockSelect">Target Time Block in Day's Activity:</label>
+          <select class="form-select" id="oppBlockSelect"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="oppActionInput">Concrete Next Action (dispatched via 'Send to Day's activity'):</label>
+          <textarea class="form-textarea" id="oppActionInput" placeholder="Define the exact next action to execute in your daily schedule..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('oppModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Opportunity</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 5: ADD / EDIT VENTURE -->
+  <div class="modal-overlay" id="ventureModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="venModalTitle">Add Venture</h3>
+        <button class="btn-icon-only" onclick="closeModal('ventureModal')">&times;</button>
+      </div>
+      <form onsubmit="handleSaveVenture(event)">
+        <input type="hidden" id="venEditIdInput" value="">
+        <div class="form-group">
+          <label class="form-label" for="venNameInput">Venture / Product Name:</label>
+          <input type="text" class="form-input" id="venNameInput" required placeholder="e.g. RECOVERYGOD.COM">
+        </div>
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label" for="venTypeInput">Type / Category:</label>
+            <input type="text" class="form-input" id="venTypeInput" placeholder="e.g. IT Services &amp; Data Recovery">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="venColorInput">Brand Color:</label>
+            <input type="color" class="form-input" id="venColorInput" value="#1E40AF" style="height: 42px; padding: 2px;">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label" for="venStatusSelect">Status:</label>
+            <select class="form-select" id="venStatusSelect">
+              <option value="Active Core">Active Core</option>
+              <option value="Published Platforms">Published Platforms</option>
+              <option value="Active Deployment">Active Deployment</option>
+              <option value="Growth Mode">Growth Mode</option>
+              <option value="Maintenance">Maintenance</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="venMetricNameInput">Metric Name:</label>
+            <input type="text" class="form-input" id="venMetricNameInput" placeholder="e.g. Active Client Tickets">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="venMetricValueInput">Current Metric Value:</label>
+          <input type="text" class="form-input" id="venMetricValueInput" placeholder="e.g. 4 Diagnoses In Flight">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="venNotesInput">Platform Notes / Capabilities:</label>
+          <textarea class="form-textarea" id="venNotesInput" placeholder="Brief note on technical architecture or proposition..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('ventureModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Venture</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 6: JSON BACKUP, EXPORT & RESTORE -->
+  <div class="modal-overlay" id="backupModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Local Data Backup &amp; Restore
+        </h3>
+        <button class="btn-icon-only" onclick="closeModal('backupModal')">&times;</button>
+      </div>
+      
+      <div style="margin-bottom: 1.25rem;">
+        <h4 style="font-size: 0.875rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem;">Export Backup</h4>
+        <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+          Download a complete JSON snapshot of all 4 time blocks, 5-pillar opportunities, active ventures, and focus logs.
+        </p>
+        <button class="btn btn-primary btn-sm" onclick="exportDataJSON()">Download Backup (.json)</button>
+      </div>
+
+      <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem; margin-bottom: 1.25rem;">
+        <h4 style="font-size: 0.875rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem;">Import Backup File</h4>
+        <input type="file" id="jsonFileInput" accept=".json,application/json" onchange="handleImportJSONFile(event)" style="font-size: 0.8125rem;">
+      </div>
+
+      <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem; margin-bottom: 1.25rem;">
+        <h4 style="font-size: 0.875rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem;">Paste Raw JSON</h4>
+        <textarea class="form-textarea" id="pasteJsonInput" placeholder="Paste exported JSON content here..."></textarea>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+          <button class="btn btn-secondary btn-sm" onclick="handlePasteJSONImport()">Restore from Pasted JSON</button>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button class="btn btn-soft-blue btn-sm" onclick="reloadDefaultData()">Reload Platform Defaults</button>
+        <button class="btn btn-danger btn-sm" onclick="clearAllData()">Clear All Data</button>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('backupModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Core Script -->
+  <script src="app.js"></script>
+</body>
+</html>
