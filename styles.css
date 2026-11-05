@@ -1433,7 +1433,7 @@ button, input, select, textarea {
 .app-credits-text {
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--text-muted);
+  color: #1E40AF;
   letter-spacing: 0.015em;
   line-height: 1.5;
 }
