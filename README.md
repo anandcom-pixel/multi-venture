@@ -16,7 +16,7 @@ A responsive single-page web application designed for solo founders, engineers, 
 
 ## 🧭 Navigation: 5 Focused Tabs
 
-1. **Tab 1: Day's activity** (Time-Blocked Operating Blocks)
+1. **Tab 1: Day's activity** (Daily Time Slots)
 2. **Tab 2: Opportunities** (5-Pillar Matrix)
 3. **Tab 3: Ventures Portfolio** (Active products & platforms)
 4. **Tab 4: Analytics & Data** (Completion rates & metrics overview)
@@ -34,30 +34,30 @@ A responsive single-page web application designed for solo founders, engineers, 
 - **Global "Daily Rhythm Completion" Progress Bar**:
   - Live progress counter: `X / Y Tasks Completed (Z%)`
   - Animated progress bar fill
-  - **"Reset Daily Checks"** button to reset today's checklist without deleting blocks or task structures.
+  - **"Reset Daily Checks"** button to reset today's checklist without deleting slots or task structures.
 - **Data Sovereignty**: JSON Export & Import buttons.
 
 ---
 
-### Tab 1: Daily Operating Rhythm (Time Blocks)
-Structured as a responsive 2-column card grid (`+ Add Time Block` button at the top):
+### Tab 1: Daily Operating Rhythm (Time Slots)
+Structured as a responsive 2-column card grid (`+ Add Time Slot` button at the top):
 
-1. **Block 1: Morning Foundation & Focus** (`08:00 AM – 10:00 AM` | Royal Blue)
+1. **Slot 1: Morning Foundation & Focus** (`08:00 AM – 10:00 AM` | Royal Blue)
    - *Objective*: Personal routine, language study (French, German, Spanish), and high-leverage solo engineering.
    - Tasks:
      - `30-min trilingual fluency drill (French, German, Spanish)` [Tag: Languages]
      - `Deep-focus coding sprint on Android Kotlin/Jetpack Compose & WebView architecture` [Tag: Android Dev]
-2. **Block 2: Commercial Core & Client Operations** (`10:00 AM – 02:00 PM` | Warm Amber)
+2. **Slot 2: Commercial Core & Client Operations** (`10:00 AM – 02:00 PM` | Warm Amber)
    - *Objective*: RECOVERYGOD.COM data recovery, IT infrastructure, and client deliverables.
    - Tasks:
      - `Handle data recovery diagnostics & storage restoration` [Tag: RECOVERYGOD]
      - `Execute computer installation, network setup & enterprise IT support calls` [Tag: IT Infra]
-3. **Block 3: Afternoon Creative & Content Engine** (`03:00 PM – 05:30 PM` | Emerald)
+3. **Slot 3: Afternoon Creative & Content Engine** (`03:00 PM – 05:30 PM` | Emerald)
    - *Objective*: Automated Node.js/Python pipelines, art print production, and storefront management.
    - Tasks:
      - `Review automated Node.js/Python publishing pipelines` [Tag: Automation]
      - `Art print production & online marketplace updates` [Tag: Creative Arts]
-4. **Block 4: Evening Review & Infrastructure Maintenance** (`07:00 PM – 08:30 PM` | Indigo)
+4. **Slot 4: Evening Review & Infrastructure Maintenance** (`07:00 PM – 08:30 PM` | Indigo)
    - *Objective*: Cloud deployments, FirmSwitch tracking, and next-day planning.
    - Tasks:
      - `Verify cloud deployments, GitHub commits & Play Console status` [Tag: DevOps]
@@ -73,7 +73,7 @@ Organized across 5 pillars with top filter chips:
 4. **Long-Term Opportunity** (Amber badge)
 5. **Extra Opportunities** (Purple badge)
 
-- **⚡ "Send to Day's activity" Action Button**: One-click dispatch of any opportunity's Concrete Next Action directly into the designated Daily Time Block in Tab 1, automatically switching the view to Tab 1 with visual focus and audio confirmation.
+- **⚡ "Send to Day's activity" Action Button**: One-click dispatch of any opportunity's Concrete Next Action directly into the designated Daily Time Slot in Tab 1, automatically switching the view to Tab 1 with visual focus and audio confirmation.
 - Full CRUD (Add, Edit, Delete).
 
 ---

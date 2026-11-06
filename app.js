@@ -27,7 +27,7 @@ const DEFAULT_DATA = {
   timeBlocks: [
     {
       id: "tb-1",
-      title: "Block 1: Morning Foundation & Focus",
+      title: "Slot 1: Morning Foundation & Focus",
       timeWindow: "08:00 AM – 10:00 AM",
       color: "#1E40AF", // Royal Blue
       objective: "Personal routine, language study (French, German, Spanish), and high-leverage solo engineering.",
@@ -50,7 +50,7 @@ const DEFAULT_DATA = {
     },
     {
       id: "tb-2",
-      title: "Block 2: Commercial Core & Client Operations",
+      title: "Slot 2: Commercial Core & Client Operations",
       timeWindow: "10:00 AM – 02:00 PM",
       color: "#D97706", // Warm Amber
       objective: "RECOVERYGOD.COM data recovery, IT infrastructure, and client deliverables.",
@@ -73,7 +73,7 @@ const DEFAULT_DATA = {
     },
     {
       id: "tb-3",
-      title: "Block 3: Afternoon Creative & Content Engine",
+      title: "Slot 3: Afternoon Creative & Content Engine",
       timeWindow: "03:00 PM – 05:30 PM",
       color: "#059669", // Emerald
       objective: "Automated Node.js/Python pipelines, art print production, and storefront management.",
@@ -96,7 +96,7 @@ const DEFAULT_DATA = {
     },
     {
       id: "tb-4",
-      title: "Block 4: Evening Review & Infrastructure Maintenance",
+      title: "Slot 4: Evening Review & Infrastructure Maintenance",
       timeWindow: "07:00 PM – 08:30 PM",
       color: "#4F46E5", // Indigo
       objective: "Cloud deployments, FirmSwitch tracking, and next-day planning.",
@@ -261,6 +261,13 @@ function loadState() {
     const parsed = JSON.parse(raw);
 
     // Schema validation
+    // Auto-migrate block titles to slot terminology
+    parsed.timeBlocks.forEach(b => {
+      if (b.title && typeof b.title === 'string' && b.title.startsWith("Block ")) {
+        b.title = b.title.replace(/^Block /, "Slot ");
+      }
+    });
+
     if (!parsed.timeBlocks || !Array.isArray(parsed.timeBlocks) || parsed.timeBlocks.length === 0) {
       return JSON.parse(JSON.stringify(DEFAULT_DATA));
     }
@@ -431,7 +438,7 @@ function renderDailyRhythmProgress() {
 
 // Reset Daily Checks (Unchecks today's tasks)
 function resetDailyChecks() {
-  if (!confirm("Reset all task checkboxes for today? Your time blocks and task structures will remain intact.")) {
+  if (!confirm("Reset all task checkboxes for today? Your time slots and task structures will remain intact.")) {
     return;
   }
 
@@ -451,7 +458,7 @@ function resetDailyChecks() {
 }
 
 // --------------------------------------------------------------------------
-// TAB 1: DAILY OPERATING RHYTHM (2-COLUMN GRID OF TIME BLOCKS)
+// TAB 1: DAILY OPERATING RHYTHM (2-COLUMN GRID OF TIME SLOTS)
 // --------------------------------------------------------------------------
 function renderTimeBlocks() {
   const container = document.getElementById('timeBlocksGridContainer');
@@ -460,8 +467,8 @@ function renderTimeBlocks() {
   if (appState.timeBlocks.length === 0) {
     container.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; background-color: var(--bg-card); border-radius: var(--radius-lg); border: 1.5px dashed var(--border-color);">
-        <p style="font-weight: 700; color: var(--text-secondary); margin-bottom: 0.75rem;">No Time Blocks created yet.</p>
-        <button class="btn btn-primary btn-sm" onclick="openAddTimeBlockModal()">+ Add Time Block</button>
+        <p style="font-weight: 700; color: var(--text-secondary); margin-bottom: 0.75rem;">No Time Slots created yet.</p>
+        <button class="btn btn-primary btn-sm" onclick="openAddTimeBlockModal()">+ Add Time Slot</button>
       </div>
     `;
     return;
@@ -487,10 +494,10 @@ function renderTimeBlocks() {
               </span>
             </div>
             <div class="block-header-actions">
-              <button class="btn-icon-only" title="Edit Block" onclick="openEditTimeBlockModal('${block.id}')">
+              <button class="btn-icon-only" title="Edit Slot" onclick="openEditTimeBlockModal('${block.id}')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
               </button>
-              <button class="btn-icon-only" title="Delete Block" onclick="confirmDeleteTimeBlock('${block.id}')">
+              <button class="btn-icon-only" title="Delete Slot" onclick="confirmDeleteTimeBlock('${block.id}')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
               </button>
             </div>
@@ -508,7 +515,7 @@ function renderTimeBlocks() {
           <!-- Tasks List inside this block -->
           <div class="block-task-list">
             ${block.tasks.length === 0 ? `
-              <div style="font-size: 0.8125rem; color: var(--text-muted); font-style: italic; padding: 0.5rem 0;">No tasks yet in this block.</div>
+              <div style="font-size: 0.8125rem; color: var(--text-muted); font-style: italic; padding: 0.5rem 0;">No tasks yet in this slot.</div>
             ` : block.tasks.map(task => {
               const isChecked = task.completedDates && task.completedDates.includes(selectedDate);
               const tagColor = task.tagColor || block.color || '#1E40AF';
@@ -549,7 +556,7 @@ function renderTimeBlocks() {
             type="text" 
             class="mini-input" 
             id="inlineInput_${block.id}" 
-            placeholder="+ Add task to this block..." 
+            placeholder="+ Add task to this slot..." 
             required
           />
           <input 
@@ -706,7 +713,7 @@ function handleSaveEditedTask(event) {
 
 // Time Block CRUD
 function openAddTimeBlockModal() {
-  document.getElementById('blockModalTitle').textContent = "Add Time Block";
+  document.getElementById('blockModalTitle').textContent = "Add Time Slot";
   document.getElementById('blockEditIdInput').value = "";
   document.getElementById('blockTitleInput').value = "";
   document.getElementById('blockTimeWindowInput').value = "09:00 AM – 11:00 AM";
@@ -720,7 +727,7 @@ function openEditTimeBlockModal(blockId) {
   const block = appState.timeBlocks.find(b => b.id === blockId);
   if (!block) return;
 
-  document.getElementById('blockModalTitle').textContent = "Edit Time Block";
+  document.getElementById('blockModalTitle').textContent = "Edit Time Slot";
   document.getElementById('blockEditIdInput').value = block.id;
   document.getElementById('blockTitleInput').value = block.title;
   document.getElementById('blockTimeWindowInput').value = block.timeWindow || "";
@@ -738,7 +745,7 @@ function handleSaveTimeBlock(event) {
   const color = document.getElementById('blockColorInput').value || "#1E40AF";
 
   if (!title) {
-    showToast("Please enter a block title.", "danger");
+    showToast("Please enter a slot title.", "danger");
     return;
   }
 
@@ -750,7 +757,7 @@ function handleSaveTimeBlock(event) {
       block.objective = objective;
       block.color = color;
     }
-    showToast("Time block updated.", "success");
+    showToast("Time slot updated.", "success");
   } else {
     const newBlock = {
       id: "tb-" + Date.now(),
@@ -761,7 +768,7 @@ function handleSaveTimeBlock(event) {
       tasks: []
     };
     appState.timeBlocks.push(newBlock);
-    showToast("New Time Block created!", "success");
+    showToast("New Time Slot created!", "success");
   }
 
   saveState();
@@ -783,7 +790,7 @@ function confirmDeleteTimeBlock(blockId) {
   renderTimeBlocks();
   renderAnalyticsDashboard();
   populateDropdowns();
-  showToast(`Time block removed.`, "info");
+  showToast(`Time slot removed.`, "info");
 }
 
 // --------------------------------------------------------------------------
@@ -840,7 +847,7 @@ function renderOpportunities() {
       border: '#BFDBFE'
     };
     const targetBlock = appState.timeBlocks.find(b => b.id === opp.targetBlockId);
-    const targetBlockName = targetBlock ? targetBlock.title : (appState.timeBlocks[0] ? appState.timeBlocks[0].title : 'Block 1');
+    const targetBlockName = targetBlock ? targetBlock.title : (appState.timeBlocks[0] ? appState.timeBlocks[0].title : 'Slot 1');
 
     return `
       <div class="opportunity-card">
@@ -873,7 +880,7 @@ function renderOpportunities() {
 
         <!-- Footer: Send to Day's activity + Edit/Delete -->
         <div class="opp-footer-actions">
-          <button class="btn btn-soft-blue btn-sm" onclick="sendOpportunityToRhythm('${opp.id}')" title="Push this concrete action directly into its target Time Block in Day's activity">
+          <button class="btn btn-soft-blue btn-sm" onclick="sendOpportunityToRhythm('${opp.id}')" title="Push this concrete action directly into its target Time Slot in Day's activity">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
             Send to Day's activity
           </button>
@@ -901,7 +908,7 @@ function sendOpportunityToRhythm(oppId) {
     targetBlock = appState.timeBlocks[0];
   }
   if (!targetBlock) {
-    showToast("No time blocks exist to receive this task.", "danger");
+    showToast("No time slots exist to receive this task.", "danger");
     return;
   }
 

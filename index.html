@@ -81,7 +81,7 @@
         </div>
 
         <div class="rhythm-actions-group">
-          <button class="btn btn-amber btn-sm" onclick="resetDailyChecks()" title="Reset all task checkboxes for today without deleting time blocks or tasks">
+          <button class="btn btn-amber btn-sm" onclick="resetDailyChecks()" title="Reset all task checkboxes for today without deleting time slots or tasks">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 2v6h6"></path><path d="M21 12A9 9 0 0 0 6 5.3L3 8"></path><path d="M21 22v-6h-6"></path><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"></path></svg>
             Reset Daily Checks
           </button>
@@ -119,24 +119,24 @@
     </nav>
 
     <!-- =========================================================================
-         TAB 1: DAILY OPERATING RHYTHM (2-COLUMN GRID OF TIME-BLOCK CARDS)
+         TAB 1: DAILY OPERATING RHYTHM (2-COLUMN GRID OF TIME-SLOT CARDS)
          ========================================================================= -->
     <section id="rhythmTab" class="view-section active">
       <div class="section-top-bar">
         <div>
           <h2 class="section-title">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            Day's Activity (Time Blocks)
+            Day's Activity (Time Slots)
           </h2>
-          <span class="section-subtitle">Structured 4-block daily schedule with high-leverage workflows and solo engineering habits</span>
+          <span class="section-subtitle">Structured 4-slot daily schedule with high-leverage workflows and solo engineering habits</span>
         </div>
         <button class="btn btn-primary" onclick="openAddTimeBlockModal()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          + Add Time Block
+          + Add Time Slot
         </button>
       </div>
 
-      <!-- Responsive 2-Column Grid of Time-Block Cards -->
+      <!-- Responsive 2-Column Grid of Time-Slot Cards -->
       <div class="time-blocks-grid" id="timeBlocksGridContainer"></div>
     </section>
 
@@ -403,18 +403,18 @@
     </div>
   </div>
 
-  <!-- MODAL 2: ADD / EDIT TIME BLOCK -->
+  <!-- MODAL 2: ADD / EDIT TIME SLOT -->
   <div class="modal-overlay" id="blockModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title" id="blockModalTitle">Add Time Block</h3>
+        <h3 class="modal-title" id="blockModalTitle">Add Time Slot</h3>
         <button class="btn-icon-only" onclick="closeModal('blockModal')">&times;</button>
       </div>
       <form onsubmit="handleSaveTimeBlock(event)">
         <input type="hidden" id="blockEditIdInput" value="">
         <div class="form-group">
-          <label class="form-label" for="blockTitleInput">Block Title:</label>
-          <input type="text" class="form-input" id="blockTitleInput" required placeholder="e.g. Block 1: Morning Foundation &amp; Focus">
+          <label class="form-label" for="blockTitleInput">Slot Title:</label>
+          <input type="text" class="form-input" id="blockTitleInput" required placeholder="e.g. Slot 1: Morning Foundation &amp; Focus">
         </div>
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem;">
           <div class="form-group">
@@ -427,12 +427,12 @@
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label" for="blockObjectiveInput">Block Objective:</label>
-          <textarea class="form-textarea" id="blockObjectiveInput" placeholder="State the core objective and leverage area for this block..."></textarea>
+          <label class="form-label" for="blockObjectiveInput">Slot Objective:</label>
+          <textarea class="form-textarea" id="blockObjectiveInput" placeholder="State the core objective and leverage area for this slot..."></textarea>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" onclick="closeModal('blockModal')">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save Time Block</button>
+          <button type="submit" class="btn btn-primary">Save Time Slot</button>
         </div>
       </form>
     </div>
@@ -456,7 +456,7 @@
             <input type="text" class="form-input" id="editTaskTagInput" placeholder="e.g. Android Dev, Core Business">
           </div>
           <div class="form-group">
-            <label class="form-label" for="editTaskBlockSelect">Assign to Block:</label>
+            <label class="form-label" for="editTaskBlockSelect">Assign to Slot:</label>
             <select class="form-select" id="editTaskBlockSelect"></select>
           </div>
         </div>
@@ -502,7 +502,7 @@
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label" for="oppBlockSelect">Target Time Block in Day's Activity:</label>
+          <label class="form-label" for="oppBlockSelect">Target Time Slot in Day's Activity:</label>
           <select class="form-select" id="oppBlockSelect"></select>
         </div>
         <div class="form-group">
@@ -586,7 +586,7 @@
       <div style="margin-bottom: 1.25rem;">
         <h4 style="font-size: 0.875rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem;">Export Backup</h4>
         <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
-          Download a complete JSON snapshot of all 4 time blocks, 5-pillar opportunities, active ventures, and focus logs.
+          Download a complete JSON snapshot of all 4 time slots, 5-pillar opportunities, active ventures, and focus logs.
         </p>
         <button class="btn btn-primary btn-sm" onclick="exportDataJSON()">Download Backup (.json)</button>
       </div>
